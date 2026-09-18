@@ -55,9 +55,10 @@ Each step depends on the one before it.
 
 ```sh
 make services     # 0. Supervisor services       -> Supervisor
-make namespace    # 1. vSphere Namespace         -> Supervisor
-#    ... then bind a storage policy + VM class in vCenter
-make preflight    # 1b. verify that binding actually happened
+#    1. CREATE THE NAMESPACE IN VCENTER  <-- not a manifest, see below
+#       Workload Management > Namespaces > Create Namespace
+#       name se-namespace, add storage policy, add VM class, grant permissions
+make preflight    # 1b. verify vCenter actually bound storage + VM class
 make cluster      # 2. Cluster                   -> Supervisor
 make addons       # 3. Add-ons                   -> Supervisor
 make login-wl     # prints the workload-cluster login command
@@ -70,10 +71,23 @@ a second and saves an hour.
 
 ## What cannot live in git
 
-A vSphere Namespace is a vCenter construct. The Supervisor API will create the
-namespace object from `00-namespace.yaml`, but these are attached in vCenter and
-have **no manifest form**:
+A vSphere Namespace is a vCenter construct. **On this Supervisor the namespace
+itself cannot be created from a manifest at all** -- applying
+`namespaces/se-namespace/00-namespace.yaml` is rejected:
 
+```
+admission webhook "default.validating.namespace.supervisor.vmware.com" denied
+the request: User is not authorized to create selfservice namespaces
+```
+
+Manifest creation only works where Namespace Self-Service is enabled and granted.
+It is not enabled here. Beware two misleading signals: `kubectl auth can-i create
+namespaces` returns `yes`, and `kubectl apply --dry-run=server` reports success.
+Neither reflects what a real apply does.
+
+These likewise have **no manifest form** and are attached in vCenter:
+
+- the namespace itself
 - storage policy binding
 - VM class binding
 - namespace permissions / RBAC

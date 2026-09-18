@@ -20,7 +20,24 @@ services: ## 0. Supervisor services (supervisor-wide, once)
 	kubectl --context=$(SUP) apply -f supervisor-services/
 
 .PHONY: namespace
-namespace: ## 1. vSphere Namespace -> Supervisor
+namespace: ## 1. How to create the namespace (vCenter, not a manifest)
+	@echo "A vSphere Namespace is created in vCenter, not by kubectl."
+	@echo "On this Supervisor a manifest apply is rejected:"
+	@echo "  'User is not authorized to create selfservice namespaces'"
+	@echo
+	@echo "Workload Management > Namespaces > Create Namespace"
+	@echo "  name     : $(NS)"
+	@echo "  storage  : add the storage policy the cluster references"
+	@echo "  VM class : add the VM class the cluster references"
+	@echo "  perms    : grant your SSO user/group edit access"
+	@echo
+	@echo "Then run: make preflight"
+	@echo
+	@echo "-- does it exist yet? --"
+	@kubectl --context=$(SUP) get ns $(NS) 2>/dev/null || echo "   not created"
+
+.PHONY: namespace-selfservice
+namespace-selfservice: ## 1-alt. Apply the namespace manifest (only if self-service is enabled)
 	kubectl --context=$(SUP) apply -f $(NSDIR)/00-namespace.yaml
 
 .PHONY: preflight
