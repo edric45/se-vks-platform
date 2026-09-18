@@ -1,0 +1,33 @@
+# VKS cluster.
+#
+# vmClass and storageClass MUST match names bound to the namespace in vCenter.
+# Check with:
+#   kubectl -n <ns> get virtualmachineclass
+#   kubectl -n <ns> get storageclass
+#
+# classRef points at a ClusterClass in vmware-system-vks-public. Use the newest
+# builtin-generic-vX.Y.Z the Supervisor offers, or a custom class from
+# ../../../../clusterclasses/.
+apiVersion: cluster.x-k8s.io/v1beta2
+kind: Cluster
+metadata:
+  name: CHANGEME
+  namespace: CHANGEME
+spec:
+  topology:
+    classRef:
+      name: builtin-generic-v3.6.0
+      namespace: vmware-system-vks-public
+    version: v1.35.5+vmware.1
+    controlPlane:
+      replicas: 1
+    workers:
+      machineDeployments:
+      - class: node-pool
+        name: node-pool-1
+        replicas: 1
+    variables:
+    - name: vmClass
+      value: best-effort-small
+    - name: storageClass
+      value: vsan-default-storage-policy

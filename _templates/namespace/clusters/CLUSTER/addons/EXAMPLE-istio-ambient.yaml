@@ -1,0 +1,35 @@
+# Istio in ambient mode. Rename and edit for real use.
+#
+# ambientMode.enabled deploys ztunnel instead of sidecars. istioCNI must stay
+# enabled -- the package schema requires it when ambient is on.
+apiVersion: addons.kubernetes.vmware.com/v1alpha1
+kind: AddonConfig
+metadata:
+  name: CLUSTER-istio
+  namespace: CHANGEME
+spec:
+  values:
+    istio:
+      ambientMode:
+        enabled: true
+      istioCNI:
+        enabled: true
+---
+apiVersion: addons.kubernetes.vmware.com/v1alpha1
+kind: AddonInstall
+metadata:
+  name: CLUSTER-istio
+  namespace: CHANGEME
+spec:
+  addonRef:
+    name: istio
+  addonConfigNameTemplate: CLUSTER-istio
+  clusters:
+  - selector:
+      matchLabels:
+        cluster.x-k8s.io/cluster-name: CLUSTER
+  crossNamespaceSelection: Blocked
+  releaseFilter:
+    ref:
+      name: istio.kubernetes.vmware.com.1.28.2-vmware.1-vks.1
+  stopMatchingBehavior: Delete

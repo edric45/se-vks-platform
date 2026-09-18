@@ -1,0 +1,33 @@
+# Cluster: se-cluster-01
+#
+# Values below are modelled on working clusters on this Supervisor:
+#   classRef  builtin-generic-v3.7.0   (newest offered here)
+#   version   v1.35.6+vmware.2         (in use by ks115-user/cluster-01)
+#
+# vmClass and storageClass MUST already be bound to se-namespace in vCenter.
+# Verify before applying:
+#   kubectl -n se-namespace get virtualmachineclass
+#   kubectl -n se-namespace get storageclass
+apiVersion: cluster.x-k8s.io/v1beta2
+kind: Cluster
+metadata:
+  name: se-cluster-01
+  namespace: se-namespace
+spec:
+  topology:
+    classRef:
+      name: builtin-generic-v3.7.0
+      namespace: vmware-system-vks-public
+    version: v1.35.6+vmware.2
+    controlPlane:
+      replicas: 1
+    workers:
+      machineDeployments:
+      - class: node-pool
+        name: se-cluster-01-np01
+        replicas: 2
+    variables:
+    - name: vmClass
+      value: best-effort-medium
+    - name: storageClass
+      value: vsan-default-storage-policy

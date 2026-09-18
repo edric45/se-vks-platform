@@ -1,0 +1,9 @@
+# Never commit private keys or certificates.
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+# Never commit kubeconfigs - they carry session tokens.
+kubeconfig*
+*.kubeconfig
