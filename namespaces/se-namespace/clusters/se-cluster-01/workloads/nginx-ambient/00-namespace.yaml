@@ -1,0 +1,38 @@
+# Application namespace, enrolled into the ambient mesh.
+#
+# istio.io/dataplane-mode=ambient is what puts these pods behind ztunnel. No
+# sidecar is injected and pods do not restart -- ztunnel captures their traffic
+# from the node. This label is the whole enrolment mechanism.
+#
+# PodSecurity is set to "baseline" rather than the cluster default "restricted".
+# Istio's generated waypoint Deployment does not set seccompProfile on its
+# istio-proxy container, and "restricted" rejects it outright:
+#
+#   pods "waypoint-..." is forbidden: violates PodSecurity "restricted:latest":
+#   seccompProfile (container "istio-proxy" must set
+#   securityContext.seccompProfile.type to "RuntimeDefault" or "Localhost")
+#
+# "baseline" still blocks privileged containers, host namespaces, hostPath and
+# privilege escalation; it simply does not mandate seccompProfile or
+# runAsNonRoot. The nginx workload in this namespace remains fully
+# restricted-compliant on its own merits -- see 10-app.yaml.
+#
+# The alternative is to hand-write the waypoint Deployment instead of letting
+# Istio generate it, which trades this relaxation for an unmanaged object that
+# will drift from the Istio version. Not worth it here.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx-ambient
+  labels:
+    # Enrols the namespace into the ambient mesh (ztunnel captures its traffic).
+    istio.io/dataplane-mode: ambient
+    # Binds this namespace's services to the waypoint defined in 30-waypoint.yaml.
+    # WITHOUT this label the waypoint is deployed and healthy but never in the
+    # data path, and L7 AuthorizationPolicy is silently not enforced. Deploying a
+    # waypoint is not the same as using one.
+    istio.io/use-waypoint: waypoint
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/audit: restricted

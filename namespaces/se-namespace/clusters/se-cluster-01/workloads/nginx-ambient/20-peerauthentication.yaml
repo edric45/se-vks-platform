@@ -1,0 +1,18 @@
+# Namespace-scoped STRICT mTLS.
+#
+# The add-on already sets enableStrictMTLS, which creates a mesh-wide
+# PeerAuthentication in istio-system. This adds an explicit namespace-level one
+# so the intent is visible in the manifests for this application rather than
+# only in the add-on values -- and so the guarantee survives someone relaxing
+# the mesh-wide default.
+#
+# In ambient mode this is enforced by ztunnel, not by a sidecar. Plaintext from
+# outside the mesh to these pods is refused.
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: nginx-ambient
+spec:
+  mtls:
+    mode: STRICT

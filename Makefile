@@ -6,7 +6,9 @@
 SUP     ?= wld-sup
 NS      ?= se-namespace
 CLUSTER ?= se-cluster-01
-WL      ?= $(SUP):$(CLUSTER)
+# kubectl vsphere login names the workload context after the cluster itself,
+# not <supervisor>:<cluster>. Override with WL=... if yours differs.
+WL      ?= $(CLUSTER)
 
 NSDIR := namespaces/$(NS)
 CLDIR := $(NSDIR)/clusters/$(CLUSTER)

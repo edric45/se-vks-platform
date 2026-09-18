@@ -1,0 +1,22 @@
+# L7 authorization, enforced by the waypoint.
+#
+# This is the point of having a waypoint: the rule matches on HTTP method, which
+# ztunnel cannot see. ztunnel is L4 only. With no waypoint present this policy
+# would not be enforced.
+#
+# Allows GET and HEAD to nginx; everything else (POST, PUT, DELETE) is denied.
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: nginx-l7
+  namespace: nginx-ambient
+spec:
+  targetRefs:
+  - kind: Service
+    group: ""
+    name: nginx
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        methods: ["GET", "HEAD"]

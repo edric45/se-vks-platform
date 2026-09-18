@@ -1,0 +1,44 @@
+# North-south L7: Envoy at the edge, on an NSX ALB VIP.
+#
+# The istio-ingressgateway installed by the add-on is an Envoy Deployment whose
+# Service is type LoadBalancer, so the VIP is allocated by NSX ALB via the
+# Supervisor. That is the L4 half. These two objects are the L7 half: the
+# Gateway binds a host and port on that Envoy, the VirtualService routes to the
+# nginx Service.
+#
+# Note the ingress gateway itself sits OUTSIDE the ambient mesh
+# (istio.io/dataplane-mode: none on its pods). It is a mesh participant via its
+# own Envoy, and reaches nginx over mTLS because the mesh-wide STRICT
+# PeerAuthentication applies.
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: nginx-gateway
+  namespace: nginx-ambient
+spec:
+  selector:
+    istio: ingressgateway        # matches the add-on's gateway Deployment
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "nginx.se.local"
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: nginx
+  namespace: nginx-ambient
+spec:
+  hosts:
+  - "nginx.se.local"
+  gateways:
+  - nginx-gateway
+  http:
+  - route:
+    - destination:
+        host: nginx.nginx-ambient.svc.cluster.local
+        port:
+          number: 80

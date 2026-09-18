@@ -1,0 +1,27 @@
+# Waypoint proxy for the nginx-ambient namespace.
+#
+# Ambient splits the data plane in two:
+#   ztunnel  per-node DaemonSet, L4 only -- mTLS, identity, L4 authorization
+#   waypoint per-namespace (or per-service) Envoy, L7 -- HTTP routing, L7
+#            authorization policy, retries, header manipulation
+#
+# There are no sidecars in ambient, so L7 features require a waypoint. Without
+# one, an AuthorizationPolicy matching on HTTP verbs or paths has nothing to
+# enforce it.
+#
+# The waypoint is created with the Gateway API, using the istio-waypoint class.
+# The namespace label below tells Istio to route this namespace's L7 traffic
+# through it.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: waypoint
+  namespace: nginx-ambient
+  labels:
+    istio.io/waypoint-for: service
+spec:
+  gatewayClassName: istio-waypoint
+  listeners:
+  - name: mesh
+    port: 15008
+    protocol: HBONE
