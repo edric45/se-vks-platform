@@ -1,0 +1,1 @@
+{"additionalProperties":false,"description":"OpenAPIv3 Schema for Kube State Metrics","properties":{"namespace":{"description":"Namespace of the component","type":"string"}},"type":"object"}
