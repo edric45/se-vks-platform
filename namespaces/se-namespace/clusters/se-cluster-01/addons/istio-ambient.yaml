@@ -36,6 +36,26 @@ spec:
         # restart deadlocked with "Insufficient cpu", which is why the cluster
         # runs best-effort-large.
         replicas: 2
+      meshConfig:
+        waypoint:
+          # Sizing for the waypoint Envoy. A waypoint proxies L7 for an entire
+          # namespace, so the package defaults (100m/128Mi -> 2/1Gi) are thin.
+          #
+          # This is the ONLY waypoint property the addon can set. HPA and PDB
+          # have no addon knob, and a ytt overlay cannot supply them either:
+          # istiod generates the waypoint Deployment at runtime, so it is not
+          # in the package for an overlay to match. They require the
+          # gateway.istio.io/defaults-for-class ConfigMap in istio-system.
+          #
+          # Verified: this propagates without an istiod restart -- the mesh
+          # controller updates the generated Deployment in place.
+          resources:
+            requests:
+              cpu: 300m
+              memory: 512Mi
+            limits:
+              cpu: "3"
+              memory: 2Gi
       gateways:
         ingress:
           enabled: true
