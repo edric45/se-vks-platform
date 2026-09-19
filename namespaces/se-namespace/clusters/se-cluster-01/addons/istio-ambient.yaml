@@ -29,6 +29,13 @@ spec:
       istioCNI:
         enabled: true
       enableStrictMTLS: true
+      pilot:
+        # Explicit rather than relying on the default, which is also 2. istiod
+        # is in the path for cert issuance, so 2 replicas matter. Note this
+        # needs node headroom: at best-effort-medium (2 vCPU) a rolling istiod
+        # restart deadlocked with "Insufficient cpu", which is why the cluster
+        # runs best-effort-large.
+        replicas: 2
       gateways:
         ingress:
           enabled: true

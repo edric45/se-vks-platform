@@ -38,7 +38,12 @@ spec:
         name: se-cluster-01-np01
         replicas: 2
     variables:
+    # best-effort-large (4 vCPU / 16Gi). Raised from best-effort-medium
+    # (2 vCPU / 8Gi), which could not hold a rolling istiod restart: the new
+    # replicas sat Pending with "Insufficient cpu" because requests, not usage,
+    # drive scheduling. Applies to control plane and workers alike -- vmClass is
+    # a cluster-wide topology variable.
     - name: vmClass
-      value: best-effort-medium
+      value: best-effort-large
     - name: storageClass
       value: vsan-default-storage-policy
