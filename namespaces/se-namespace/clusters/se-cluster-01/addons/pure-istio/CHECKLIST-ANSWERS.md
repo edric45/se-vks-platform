@@ -11,7 +11,21 @@ copied verbatim.
 achievable, but not through add-on settings · **No** — not available ·
 **Differs** — the intent is met, the specifics differ on this platform.
 
-A `verify.sh` in this directory re-runs every check against a live cluster.
+A `verify.sh` in this directory re-runs every check against a live cluster:
+
+```sh
+SUP=<supervisor-context> WL=<workload-cluster-context> ./verify.sh
+```
+
+`apply.sh` applies the add-on configuration and wires up the overlays:
+
+```sh
+SUP=<supervisor-context> WL=<workload-cluster-context> ./apply.sh
+```
+
+Both need the `PI` variable set if your PackageInstall is not named
+`se-cluster-01-istio` — find it with
+`kubectl -n vmware-system-tkg get packageinstall`.
 
 ---
 

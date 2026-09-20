@@ -2,7 +2,10 @@
 # Check the cluster against the application team's checklist.
 # Read-only. Prints PASS / FAIL / N/A per item with the evidence.
 set -u
+# WL is the workload cluster kubectl context. SUP (the Supervisor context) is
+# only needed for the release-pin check; that row is skipped if it is unset.
 WL="${WL:-se-cluster-01}"
+SUP="${SUP:-}"
 K="kubectl --context=$WL"
 pass() { printf '  PASS  %-46s %s\n' "$1" "$2"; }
 fail() { printf '  FAIL  %-46s %s\n' "$1" "$2"; }
@@ -67,7 +70,11 @@ po=$($K -n istio-system get ds ztunnel -o jsonpath='{.spec.template.metadata.ann
 
 echo
 echo "OPERATIONS"
-rel=$(kubectl --context="${SUP:-172.17.10.2}" -n se-namespace get addoninstall se-cluster-01-istio -o jsonpath='{.spec.releaseFilter.ref.name}' 2>/dev/null)
-[ -n "$rel" ] && pass "release pinned (upgrades are explicit)" "$rel" || fail "release pin" "not pinned"
+if [ -n "$SUP" ]; then
+  rel=$(kubectl --context="$SUP" -n "${SUP_NS:-se-namespace}" get addoninstall "${AI:-se-cluster-01-istio}" -o jsonpath='{.spec.releaseFilter.ref.name}' 2>/dev/null)
+  [ -n "$rel" ] && pass "release pinned (upgrades are explicit)" "$rel" || fail "release pin" "not found"
+else
+  na "release pinned (upgrades are explicit)" "set SUP=<supervisor context> to check"
+fi
 us=$($K -n istio-system get ds istio-cni-node -o jsonpath='{.spec.updateStrategy.rollingUpdate.maxUnavailable}' 2>/dev/null)
 na "canary istio-cni rollout" "DaemonSet maxUnavailable=${us:-1}; no add-on setting for staged rollout"

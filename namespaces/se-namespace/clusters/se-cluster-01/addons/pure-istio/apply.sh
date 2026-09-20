@@ -12,8 +12,11 @@
 # to the generated PackageInstall. Re-run this after a cluster rebuild, and
 # after any add-on version change.
 set -eu
-SUP="${SUP:-172.17.10.2}"
-WL="${WL:-se-cluster-01}"
+# Set these for your environment. SUP is the kubectl context for the
+# Supervisor; WL the context for the workload cluster; PI the PackageInstall
+# name the add-on generated (kubectl -n vmware-system-tkg get packageinstall).
+: "${SUP:?set SUP to your Supervisor kubectl context}"
+: "${WL:?set WL to your workload cluster kubectl context}"
 PI="${PI:-se-cluster-01-istio}"
 cd "$(dirname "$0")"
 
