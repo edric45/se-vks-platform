@@ -1,0 +1,59 @@
+# Headlamp 0.42.0 on se-cluster-01 -- a web UI for the cluster.
+#
+# Two dependencies worth knowing, both already satisfied here:
+#
+#   cert-manager  tls.certManager.enabled defaults to true. The addon creates
+#                 its own Issuer (headlamp-issuer) and a self-signed CA cert,
+#                 so cert-manager must be installed first. See cert-manager.yaml.
+#   NSX ALB       service.type defaults to LoadBalancer on :443, so the VIP is
+#                 allocated by Avi through the Supervisor.
+#
+# Deliberately NOT enabling gatewayApi. The addon can instead expose itself
+# through a Gateway API Gateway with className "istio" -- which our Istio addon
+# provides -- but that is a second, separate ingress path. Starting with the
+# plain LoadBalancer keeps the first install simple; switching later is one flag.
+#
+# Access is via a token: Headlamp has no user database. You create a
+# ServiceAccount, grant it RBAC, and paste its token at the login screen.
+# Whatever that ServiceAccount can do, the user can do.
+apiVersion: addons.kubernetes.vmware.com/v1alpha1
+kind: AddonConfig
+metadata:
+  name: se-cluster-01-headlamp
+  namespace: se-namespace
+spec:
+  values:
+    namespace: headlamp
+    createNamespace: true
+    service:
+      type: LoadBalancer
+      port: 443
+      targetPort: 443
+    tls:
+      certManager:
+        enabled: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        memory: 256Mi
+---
+apiVersion: addons.kubernetes.vmware.com/v1alpha1
+kind: AddonInstall
+metadata:
+  name: se-cluster-01-headlamp
+  namespace: se-namespace
+spec:
+  addonRef:
+    name: headlamp
+  addonConfigNameTemplate: se-cluster-01-headlamp
+  clusters:
+  - selector:
+      matchLabels:
+        cluster.x-k8s.io/cluster-name: se-cluster-01
+  crossNamespaceSelection: Blocked
+  releaseFilter:
+    ref:
+      name: headlamp.kubernetes.vmware.com.0.42.0-vmware.1-vks.1
+  stopMatchingBehavior: Delete
