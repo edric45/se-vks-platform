@@ -6,6 +6,7 @@
 SUP     ?= wld-sup
 NS      ?= se-namespace
 CLUSTER ?= se-cluster-01
+ISTIO_VER ?= 1.28
 # kubectl vsphere login names the workload context after the cluster itself,
 # not <supervisor>:<cluster>. Override with WL=... if yours differs.
 WL      ?= $(CLUSTER)
@@ -56,8 +57,16 @@ cluster: ## 2. Cluster -> Supervisor
 	kubectl --context=$(SUP) apply -f $(CLDIR)/00-cluster.yaml
 
 .PHONY: addons
-addons: ## 3. Add-ons -> Supervisor
+addons: ## 3. Add-ons -> Supervisor (flat files only; istio is versioned, see below)
 	kubectl --context=$(SUP) apply -f $(CLDIR)/addons/
+
+.PHONY: istio
+istio: ## 3b. Istio at ISTIO_VER (default 1.28) -> Supervisor
+	kubectl --context=$(SUP) apply -f $(CLDIR)/addons/istio/$(ISTIO_VER)/addon.yaml
+
+.PHONY: overlays
+overlays: ## 3c. Deliver ytt overlays -> WORKLOAD cluster PackageInstalls
+	@./apply-overlays.sh
 
 .PHONY: workloads
 workloads: ## 4. Applications -> WORKLOAD cluster

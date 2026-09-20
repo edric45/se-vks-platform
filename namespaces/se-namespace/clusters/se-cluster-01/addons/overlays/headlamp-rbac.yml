@@ -1,0 +1,83 @@
+# Login identities for Headlamp, injected into the Headlamp package render.
+#
+# Headlamp has no user database: you authenticate by pasting a ServiceAccount
+# token, and the UI acts as that identity. The addon ships no RBAC options in
+# its values schema, so without this the SAs have to be created by hand outside
+# git and recreated on every cluster rebuild.
+#
+# This is a plain manifest, not a ytt overlay patch -- kapp-controller adds the
+# file to ytt's input set and ytt emits it, so the objects join the package's
+# managed set. See README.md in this directory.
+#
+# Generate a token with:
+#   kubectl -n headlamp create token headlamp-viewer --duration=8h
+#   kubectl -n headlamp create token headlamp-debug  --duration=8h
+---
+# Read-only browsing.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: headlamp-viewer
+  namespace: headlamp
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: headlamp-viewer
+subjects:
+- kind: ServiceAccount
+  name: headlamp-viewer
+  namespace: headlamp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+---
+# Node shell and pod debug.
+#
+# WARNING: this is root on any node. Headlamp's node shell creates a pod with
+# hostPID, hostNetwork and hostPath "/" -- so a holder of this token can read
+# kubelet credentials and the etcd encryption key off any node. Treat it as
+# cluster-admin equivalent, not as a slightly-more-capable viewer.
+#
+# Neither "view" nor "edit" grants what these features need: pods/ephemeralcontainers
+# for attaching a debug container, and create pods + pods/exec for the node shell.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: headlamp-debug
+  namespace: headlamp
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: headlamp-debug
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/log", "pods/status"]
+  verbs: ["get", "list", "watch", "create", "delete"]
+- apiGroups: [""]
+  resources: ["pods/exec", "pods/attach", "pods/portforward"]
+  verbs: ["create", "get"]
+- apiGroups: [""]
+  resources: ["pods/ephemeralcontainers"]
+  verbs: ["get", "patch", "update"]
+- apiGroups: [""]
+  resources: ["nodes", "nodes/proxy", "namespaces", "services", "events", "configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets", "daemonsets", "statefulsets"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: headlamp-debug
+subjects:
+- kind: ServiceAccount
+  name: headlamp-debug
+  namespace: headlamp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: headlamp-debug
