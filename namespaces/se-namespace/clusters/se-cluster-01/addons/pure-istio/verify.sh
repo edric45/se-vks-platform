@@ -42,7 +42,13 @@ echo "CA / IDENTITY"
 td=$($K -n istio-system get cm istio -o jsonpath='{.data.mesh}' 2>/dev/null | grep -o 'trustDomain: .*' | head -1)
 [ -n "$td" ] && pass "trust domain" "$td" || fail "trust domain" "not found"
 cacerts=$($K -n istio-system get secret cacerts --no-headers 2>/dev/null | awk '{print "present"}')
-pass "CA mode" "${cacerts:-istiod self-signed (no cacerts secret)}"
+if [ -n "$cacerts" ]; then
+  st=$($K -n istio-system get secrettemplate cacerts --no-headers 2>/dev/null | awk '{print "cert-manager + SecretTemplate"}')
+  root=$($K -n default get cm istio-ca-root-cert -o jsonpath='{.data.root-cert\.pem}' 2>/dev/null | openssl x509 -noout -subject 2>/dev/null | sed 's/subject=//')
+  pass "CA mode" "plug-in via cacerts (${st:-manual}); root ${root}"
+else
+  pass "CA mode" "istiod self-signed (no cacerts secret)"
+fi
 ctna=$($K -n istio-system get deploy istiod -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="CA_TRUSTED_NODE_ACCOUNTS")].value}' 2>/dev/null)
 [ -n "$ctna" ] && pass "caTrustedNodeAccounts includes ztunnel" "$ctna" || fail "caTrustedNodeAccounts" "not set"
 
