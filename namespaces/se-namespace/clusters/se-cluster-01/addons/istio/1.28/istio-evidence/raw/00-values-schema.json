@@ -1,0 +1,1119 @@
+{
+    "openAPIv3": {
+        "description": "OpenAPIv3 Schema for istio",
+        "properties": {
+            "istio": {
+                "additionalProperties": false,
+                "properties": {
+                    "ambientMode": {
+                        "additionalProperties": false,
+                        "description": "Configuration for istio ambient mode.",
+                        "properties": {
+                            "enabled": {
+                                "default": false,
+                                "description": "The flag to enable ambient mode in istio or not. The default value is false.",
+                                "type": "boolean"
+                            },
+                            "ztunnel": {
+                                "additionalProperties": false,
+                                "description": "Configurations for the ztunnel. The settings take effect only when ambient mode is enabled.",
+                                "properties": {
+                                    "resources": {
+                                        "additionalProperties": false,
+                                        "description": "Resources for the containers run in the ztunnel Pods.",
+                                        "properties": {
+                                            "limits": {
+                                                "additionalProperties": false,
+                                                "description": "Resource limits for the container.",
+                                                "nullable": true,
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "",
+                                                        "description": "The limited CPUs for the container.",
+                                                        "minLength": 1,
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "",
+                                                        "description": "The limited memories for the container.",
+                                                        "minLength": 1,
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "requests": {
+                                                "additionalProperties": false,
+                                                "description": "Resource requests for the container.",
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "200m",
+                                                        "description": "Requested CPUs for the container.",
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "512Mi",
+                                                        "description": "Requested Memories for the container.",
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "enableGatewayAPIInference": {
+                        "default": false,
+                        "description": "The flag to enables support for the Kubernetes Gateway API Inference extension feature. Note, support in Istio is currently experimental.",
+                        "type": "boolean"
+                    },
+                    "enableStrictMTLS": {
+                        "default": false,
+                        "description": "The flag to enable strict mTLS in the mesh level. A default PeerAuthentication with mode STRICT is created in the mesh if it is true. The default value is false.",
+                        "type": "boolean"
+                    },
+                    "gateways": {
+                        "additionalProperties": false,
+                        "description": "Configuration for istio gateways",
+                        "properties": {
+                            "egress": {
+                                "additionalProperties": false,
+                                "description": "Configuration for istio egress gateway",
+                                "properties": {
+                                    "autoscaling": {
+                                        "additionalProperties": false,
+                                        "description": "Configuration for the Istio egress gateway autoscaling.",
+                                        "properties": {
+                                            "enabled": {
+                                                "default": false,
+                                                "description": "The flag to enable autoscaling on istio egress gateway. The default value is false.",
+                                                "type": "boolean"
+                                            },
+                                            "maxReplicas": {
+                                                "default": 5,
+                                                "description": "The maximum number of replicas for the istio egress gateway. The default value is 5.",
+                                                "type": "integer"
+                                            },
+                                            "minReplicas": {
+                                                "default": 1,
+                                                "description": "The minimum number of replicas for the istio egress gateway. The default value is 1.",
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "enabled": {
+                                        "default": false,
+                                        "description": "The flag to install Istio egress gateway or not. The default value is false.",
+                                        "type": "boolean"
+                                    },
+                                    "namespace": {
+                                        "default": "istio-egress",
+                                        "description": "The namespace to install Istio egress gateway.",
+                                        "minLength": 1,
+                                        "type": "string"
+                                    },
+                                    "namespaceLimitRange": {
+                                        "additionalProperties": false,
+                                        "description": "Configuration for the LimitRange set in the Istio egress namespace.",
+                                        "properties": {
+                                            "defaultLimits": {
+                                                "additionalProperties": false,
+                                                "description": "Configuration for the default resources limits applied for all Pods (and their containers) that do not set compute resource requests in the namespace.",
+                                                "nullable": true,
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "",
+                                                        "description": "The default CPU limits.",
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "",
+                                                        "description": "The default Memory limits.",
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "defaultRequests": {
+                                                "additionalProperties": false,
+                                                "description": "Configuration for the default resources requests applied for all Pods (and their containers) that do not set compute resource requests in the namespace.",
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "100m",
+                                                        "description": "The default CPU requests.",
+                                                        "minLength": 1,
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "128Mi",
+                                                        "description": "The default Memory requests.",
+                                                        "minLength": 1,
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "priorityClassName": {
+                                        "default": "",
+                                        "description": "The priority class assigned to the istio-egressgateway Pods.",
+                                        "type": "string"
+                                    },
+                                    "replicas": {
+                                        "default": 1,
+                                        "description": "The replicas set in the istio-egressgateway Deployment. It takes effect when autoscaling is disabled. The default value is 1.",
+                                        "type": "integer"
+                                    },
+                                    "resources": {
+                                        "additionalProperties": false,
+                                        "description": "Resources for the container run in the istio-egressgateway Pod. The settings take effect only when istio-egressgateway is enabled.",
+                                        "properties": {
+                                            "limits": {
+                                                "additionalProperties": false,
+                                                "description": "Resource limits for the container.",
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "2000m",
+                                                        "description": "The limited CPUs for the container.",
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "1024Mi",
+                                                        "description": "The limited memories for the container.",
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "requests": {
+                                                "additionalProperties": false,
+                                                "description": "Resource requests for the container.",
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "100m",
+                                                        "description": "The requested CPUs for the container.",
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "128Mi",
+                                                        "description": "The limited memories for the container.",
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "ingress": {
+                                "additionalProperties": false,
+                                "description": "Configuration for istio ingress gateway",
+                                "properties": {
+                                    "autoscaling": {
+                                        "additionalProperties": false,
+                                        "description": "Configuration for the Istio ingress gateway autoscaling.",
+                                        "properties": {
+                                            "enabled": {
+                                                "default": false,
+                                                "description": "The flag to enable autoscaling on istio ingress gateway. The default value is false.",
+                                                "type": "boolean"
+                                            },
+                                            "maxReplicas": {
+                                                "default": 5,
+                                                "description": "The maximum number of replicas for the istio ingress gateway. The default value is 5.",
+                                                "type": "integer"
+                                            },
+                                            "minReplicas": {
+                                                "default": 1,
+                                                "description": "The minimum number of replicas for the istio ingress gateway. The default value is 1.",
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "enabled": {
+                                        "default": false,
+                                        "description": "The flag to install Istio ingress gateway or not. The default value is false.",
+                                        "type": "boolean"
+                                    },
+                                    "namespace": {
+                                        "default": "istio-ingress",
+                                        "description": "The namespace to install Istio ingress gateway.",
+                                        "minLength": 1,
+                                        "type": "string"
+                                    },
+                                    "namespaceLimitRange": {
+                                        "additionalProperties": false,
+                                        "description": "Configuration for the LimitRange set in the Istio ingress namespace.",
+                                        "properties": {
+                                            "defaultLimits": {
+                                                "additionalProperties": false,
+                                                "description": "Configuration for the default resources limits applied for all Pods (and their containers) that do not set compute resource requests in the namespace.",
+                                                "nullable": true,
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "",
+                                                        "description": "The default CPU limits.",
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "",
+                                                        "description": "The default Memory limits.",
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "defaultRequests": {
+                                                "additionalProperties": false,
+                                                "description": "Configuration for the default resources requests applied for all Pods (and their containers) that do not set compute resource requests in the namespace.",
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "100m",
+                                                        "description": "The default CPU requests.",
+                                                        "minLength": 1,
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "128Mi",
+                                                        "description": "The default Memory requests.",
+                                                        "minLength": 1,
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "priorityClassName": {
+                                        "default": "",
+                                        "description": "The priority class assigned to the istio-ingressgateway Pods.",
+                                        "type": "string"
+                                    },
+                                    "replicas": {
+                                        "default": 1,
+                                        "description": "The replicas set in the istio-ingressgateway Deployment. It takes effect when autoscaling is disabled. The default value is 1.",
+                                        "type": "integer"
+                                    },
+                                    "resources": {
+                                        "additionalProperties": false,
+                                        "description": "Resources for the container run in the istio-ingressgateway Pod. The settings take effect only when istio-ingressgateway is enabled.",
+                                        "properties": {
+                                            "limits": {
+                                                "additionalProperties": false,
+                                                "description": "Resource limits for the container.",
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "2000m",
+                                                        "description": "The limited CPUs for the container.",
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "1024Mi",
+                                                        "description": "The limited memories for the container.",
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "requests": {
+                                                "additionalProperties": false,
+                                                "description": "Resource requests for the container.",
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "100m",
+                                                        "description": "The requested CPUs for the container.",
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "128Mi",
+                                                        "description": "The limited memories for the container.",
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "istioCNI": {
+                        "additionalProperties": false,
+                        "description": "Configuration for istio-cni.",
+                        "properties": {
+                            "enabled": {
+                                "default": true,
+                                "description": "The flag to install istio-cni or not. It must be true if ambient mode is enabled. The default value is true.",
+                                "type": "boolean"
+                            },
+                            "resources": {
+                                "additionalProperties": false,
+                                "description": "Resources for the container run in the istio-cni-node Pods. The settings take effect only when istioCNI is enabled.",
+                                "properties": {
+                                    "limits": {
+                                        "additionalProperties": false,
+                                        "description": "Resource limits for the container. It is not set by default.",
+                                        "nullable": true,
+                                        "properties": {
+                                            "cpu": {
+                                                "default": "",
+                                                "description": "The limited CPUs for the container.",
+                                                "minLength": 1,
+                                                "type": "string"
+                                            },
+                                            "memory": {
+                                                "default": "",
+                                                "description": "The limited memories for the container.",
+                                                "minLength": 1,
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "requests": {
+                                        "additionalProperties": false,
+                                        "description": "Resource requests for the container.",
+                                        "properties": {
+                                            "cpu": {
+                                                "default": "100m",
+                                                "description": "Requested CPUs for the container.",
+                                                "type": "string"
+                                            },
+                                            "memory": {
+                                                "default": "100Mi",
+                                                "description": "Requested Memories for the container.",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "meshConfig": {
+                        "additionalProperties": false,
+                        "description": "Configuration for meshConfig",
+                        "properties": {
+                            "accessLogFile": {
+                                "default": "/dev/stdout",
+                                "description": "File path for the proxy access log. Empty value disables access logging.",
+                                "type": "string"
+                            },
+                            "connectTimeout": {
+                                "default": "10s",
+                                "description": "Connection timeout used by Envoy. The value must be >=1ms. The default value is 10s.",
+                                "type": "string"
+                            },
+                            "defaultProviders": {
+                                "additionalProperties": false,
+                                "description": "Specifies extension providers to use by default in Istio configuration resources.",
+                                "properties": {
+                                    "tracing": {
+                                        "default": null,
+                                        "description": "Configurations for the default tracing provider(s). By default, no tracing provider is set.",
+                                        "items": {
+                                            "default": "",
+                                            "type": "string"
+                                        },
+                                        "nullable": true,
+                                        "type": "array"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "enableDNSProxy": {
+                                "default": false,
+                                "description": "The flag to enable feature DNS Proxy with sidecar mode. The default value is false. Note, DNS Proxy is always enabled with ambient mode.",
+                                "type": "boolean"
+                            },
+                            "enablePrometheusMerge": {
+                                "default": true,
+                                "description": "Flag to merge metrics exposed by the application with metrics from Envoy and Istio agent. Disable the flag if a separately managed Envoy is running with an Istio sidecar",
+                                "type": "boolean"
+                            },
+                            "enableTracing": {
+                                "default": true,
+                                "description": "The flag to control generation of trace spans and request IDs",
+                                "type": "boolean"
+                            },
+                            "extensionProviders": {
+                                "default": null,
+                                "description": "Configurations of the extension providers that extend istio\u2019s functionality. By default, prometheus, stackdriver and envoyFileAccessLog are configured. envoyFileAccessLog can be disabled by setting meshConfig.accessLogFile with an empty string.",
+                                "items": {
+                                    "additionalProperties": false,
+                                    "description": "The name of the extension provider. It is not an empty string.",
+                                    "properties": {
+                                        "name": {
+                                            "default": "",
+                                            "type": "string"
+                                        },
+                                        "opentelemetry": {
+                                            "additionalProperties": false,
+                                            "description": "Configurations for an OpenTelemetry tracing provider. At most one OpenTelemetry provider can be configured in extension providers.",
+                                            "nullable": true,
+                                            "properties": {
+                                                "dynatraceSampler": {
+                                                    "additionalProperties": false,
+                                                    "description": "The Dynatrace adaptive traffic management (ATM) sampler.",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "clusterId": {
+                                                            "default": 0,
+                                                            "description": "The identifier of the cluster in the Dynatrace platform. It is required.",
+                                                            "type": "integer"
+                                                        },
+                                                        "httpService": {
+                                                            "additionalProperties": false,
+                                                            "description": "The Dynatrace HTTP API to obtain sampling configuration.",
+                                                            "nullable": true,
+                                                            "properties": {
+                                                                "http": {
+                                                                    "additionalProperties": false,
+                                                                    "description": "The configuration for an HTTP service that can be used by an OpenTelemetry Provider",
+                                                                    "nullable": true,
+                                                                    "properties": {
+                                                                        "headers": {
+                                                                            "default": null,
+                                                                            "description": "The custom HTTP headers that will be added.",
+                                                                            "items": {
+                                                                                "additionalProperties": false,
+                                                                                "description": "The HTTP header name. A valid HTTP header name is required.",
+                                                                                "properties": {
+                                                                                    "name": {
+                                                                                        "default": "",
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "value": {
+                                                                                        "default": "",
+                                                                                        "description": "The HTTP header value. A valid HTTP header value is required.",
+                                                                                        "type": "string"
+                                                                                    }
+                                                                                },
+                                                                                "type": "object"
+                                                                            },
+                                                                            "nullable": true,
+                                                                            "type": "array"
+                                                                        },
+                                                                        "path": {
+                                                                            "default": "",
+                                                                            "description": "The path on the HTTP service. A valid HTTP service path is required.",
+                                                                            "type": "string"
+                                                                        },
+                                                                        "timeout": {
+                                                                            "default": null,
+                                                                            "description": "The timeout for the HTTP request.",
+                                                                            "nullable": true,
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                },
+                                                                "port": {
+                                                                    "default": 0,
+                                                                    "description": "The port of the HTTP service.",
+                                                                    "type": "integer"
+                                                                },
+                                                                "service": {
+                                                                    "default": "",
+                                                                    "description": "The Dynatrace environment to obtain the sampling configuration. It is required.",
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "rootSpansPerMinute": {
+                                                            "default": 1000,
+                                                            "description": "The number of sampled spans per minute to be used.",
+                                                            "type": "integer"
+                                                        },
+                                                        "tenant": {
+                                                            "default": "",
+                                                            "description": "The Dynatrace customer's tenant identifier. It is required.",
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "grpc": {
+                                                    "additionalProperties": false,
+                                                    "description": "The configuration for exporting OTLP traces via GRPC.",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "initialMetadata": {
+                                                            "default": null,
+                                                            "description": "The additional metadata to include in streams initiated to the GrpcService.",
+                                                            "items": {
+                                                                "additionalProperties": false,
+                                                                "description": "The HTTP header name. A valid HTTP header name is required.",
+                                                                "properties": {
+                                                                    "name": {
+                                                                        "default": "",
+                                                                        "type": "string"
+                                                                    },
+                                                                    "value": {
+                                                                        "default": "",
+                                                                        "description": "The HTTP header value. A valid HTTP header value is required.",
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "nullable": true,
+                                                            "type": "array"
+                                                        },
+                                                        "timeout": {
+                                                            "default": null,
+                                                            "description": "The timeout for the GRPC request.",
+                                                            "nullable": true,
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "http": {
+                                                    "additionalProperties": false,
+                                                    "description": "The configuration for an HTTP service that can be used by an OpenTelemetry Provider",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "headers": {
+                                                            "default": null,
+                                                            "description": "The custom HTTP headers that will be added.",
+                                                            "items": {
+                                                                "additionalProperties": false,
+                                                                "description": "The HTTP header name. A valid HTTP header name is required.",
+                                                                "properties": {
+                                                                    "name": {
+                                                                        "default": "",
+                                                                        "type": "string"
+                                                                    },
+                                                                    "value": {
+                                                                        "default": "",
+                                                                        "description": "The HTTP header value. A valid HTTP header value is required.",
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "nullable": true,
+                                                            "type": "array"
+                                                        },
+                                                        "path": {
+                                                            "default": "",
+                                                            "description": "The path on the HTTP service. A valid HTTP service path is required.",
+                                                            "type": "string"
+                                                        },
+                                                        "timeout": {
+                                                            "default": null,
+                                                            "description": "The timeout for the HTTP request.",
+                                                            "nullable": true,
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "maxTagLength": {
+                                                    "default": null,
+                                                    "description": "The overall path length allowed in a reported span..",
+                                                    "nullable": true,
+                                                    "type": "integer"
+                                                },
+                                                "port": {
+                                                    "default": 0,
+                                                    "description": "The OpenTelemetry service port that will receive OTLP traces.",
+                                                    "type": "integer"
+                                                },
+                                                "resourceDetectors": {
+                                                    "additionalProperties": false,
+                                                    "description": "The Resource Detectors to be used by the OpenTelemetry provider..",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "dynatrace": {
+                                                            "additionalProperties": false,
+                                                            "description": "The Dynatrace Resource Detector.",
+                                                            "nullable": true,
+                                                            "properties": {},
+                                                            "type": "object"
+                                                        },
+                                                        "environment": {
+                                                            "additionalProperties": false,
+                                                            "description": "The OpenTelemetry Environment Resource Detector.",
+                                                            "nullable": true,
+                                                            "properties": {},
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "service": {
+                                                    "default": "",
+                                                    "description": "The OpenTelemetry service endpoint that will receive OTLP traces.",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "zipkin": {
+                                            "additionalProperties": false,
+                                            "description": "Configurations for a Zipkin tracing provider. At most one Zipkin provider can be configured in extension providers. ",
+                                            "nullable": true,
+                                            "properties": {
+                                                "enable64bitTraceId": {
+                                                    "default": false,
+                                                    "description": "The flag to use a 64 bit trace id. The default value is false, meaning a 128 bit trace id is used.",
+                                                    "type": "boolean"
+                                                },
+                                                "maxTagLength": {
+                                                    "default": null,
+                                                    "description": "The overall path length allowed in a reported span..",
+                                                    "nullable": true,
+                                                    "type": "integer"
+                                                },
+                                                "path": {
+                                                    "default": "/api/v2/spans",
+                                                    "description": "The endpoint of Zipkin API. The default value is '/api/v2/span'",
+                                                    "type": "string"
+                                                },
+                                                "port": {
+                                                    "default": 0,
+                                                    "description": "The service port for Zipkin API. A valid service port is required.",
+                                                    "type": "integer"
+                                                },
+                                                "service": {
+                                                    "default": "",
+                                                    "description": "The service for Zipkin API. A valid service is required.",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "nullable": true,
+                                "type": "array"
+                            },
+                            "externalIstiod": {
+                                "default": false,
+                                "description": "Controls whether one external istiod is enabled. It must be true if the current cluster is working as primary in the primary-remote model.",
+                                "type": "boolean"
+                            },
+                            "imagePullSecrets": {
+                                "default": null,
+                                "description": "Specifies a list of Secrets in the same Namespace to pull images from the private docker registry for Istio injected resources.",
+                                "items": {
+                                    "default": "",
+                                    "type": "string"
+                                },
+                                "nullable": true,
+                                "type": "array"
+                            },
+                            "ingressControllerMode": {
+                                "default": "STRICT",
+                                "description": "Defines whether to use Istio ingress controller for annotated or all ingress resources.",
+                                "enum": [
+                                    "STRICT",
+                                    "UNSPECIFIED",
+                                    "DEFAULT",
+                                    "OFF"
+                                ],
+                                "type": "string"
+                            },
+                            "ingressSelector": {
+                                "default": "ingressgateway",
+                                "description": "Defines which gateway deployment to use as the Ingress controller.",
+                                "type": "string"
+                            },
+                            "meshID": {
+                                "default": "",
+                                "description": "The unique identifier for the service mesh.",
+                                "type": "string"
+                            },
+                            "meshMTLS": {
+                                "additionalProperties": false,
+                                "description": "The Configuration of mTLS for traffic between workloads with ISTIO_MUTUAL TLS traffic.",
+                                "properties": {
+                                    "minProtocolVersion": {
+                                        "default": "TLSV1_2",
+                                        "description": "The minimum TLS protocol version. The default value is TLSV1_2.",
+                                        "enum": [
+                                            "TLSV1_2",
+                                            "TLSV1_3"
+                                        ],
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "multiCluster": {
+                                "additionalProperties": false,
+                                "description": "Configuration for Istio multiclusters.",
+                                "nullable": true,
+                                "properties": {
+                                    "clusterName": {
+                                        "default": "",
+                                        "description": "The cluster name.",
+                                        "type": "string"
+                                    },
+                                    "clusterProfile": {
+                                        "default": "primary",
+                                        "description": "The profile of the current cluster. The supported values including primary and remote.",
+                                        "enum": [
+                                            "primary",
+                                            "remote"
+                                        ],
+                                        "type": "string"
+                                    },
+                                    "enabled": {
+                                        "default": false,
+                                        "description": "Flag to enable the multi-cluster feature. The default value is false.",
+                                        "type": "boolean"
+                                    },
+                                    "primaryClusterNames": {
+                                        "default": null,
+                                        "description": "A list of the primary clusters. It must set if clusterProfile is remote. Use ',' as the splitter in case multiple primary clusters exist.",
+                                        "items": {
+                                            "default": "",
+                                            "type": "string"
+                                        },
+                                        "nullable": true,
+                                        "type": "array"
+                                    },
+                                    "remotePilotAddress": {
+                                        "default": "",
+                                        "description": "Configure remote pilot and istiod service and endpoint. It must set if clusterProfile is remote",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "network": {
+                                "default": "",
+                                "description": "Defines the network this cluster belongs to.",
+                                "type": "string"
+                            },
+                            "proxy": {
+                                "additionalProperties": false,
+                                "description": "Configurations for the istio sidecar Pods.",
+                                "properties": {
+                                    "resources": {
+                                        "additionalProperties": false,
+                                        "description": "Resources for the proxy container run by istio sidecar injector.",
+                                        "properties": {
+                                            "limits": {
+                                                "additionalProperties": false,
+                                                "description": "Resource limits for the container.",
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "2000m",
+                                                        "description": "The limited CPUs for the container.",
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "1024Mi",
+                                                        "description": "The limited memories for the container.",
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "requests": {
+                                                "additionalProperties": false,
+                                                "description": "Resource requests for the container.",
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "100m",
+                                                        "description": "The requested CPUs for the container.",
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "128Mi",
+                                                        "description": "The requested memories for the container.",
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "trustDomain": {
+                                "default": "cluster.local",
+                                "description": "The trust domain corresponds to the trust root of a system.",
+                                "type": "string"
+                            },
+                            "trustDomainAliases": {
+                                "default": [],
+                                "description": "The trust domain aliases represent the aliases of trustDomain",
+                                "items": {
+                                    "default": "",
+                                    "type": "string"
+                                },
+                                "type": "array"
+                            },
+                            "waypoint": {
+                                "additionalProperties": false,
+                                "description": "Configurations for the istio waypoint Pods.",
+                                "properties": {
+                                    "resources": {
+                                        "additionalProperties": false,
+                                        "description": "Resources for the waypoint container run by istio sidecar injector.",
+                                        "properties": {
+                                            "limits": {
+                                                "additionalProperties": false,
+                                                "description": "Resource limits for the container.",
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "2",
+                                                        "description": "The limited CPUs for the container.",
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "1Gi",
+                                                        "description": "The limited memories for the container.",
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "requests": {
+                                                "additionalProperties": false,
+                                                "description": "Resource requests for the container.",
+                                                "properties": {
+                                                    "cpu": {
+                                                        "default": "100m",
+                                                        "description": "The requested CPUs for the container.",
+                                                        "type": "string"
+                                                    },
+                                                    "memory": {
+                                                        "default": "128Mi",
+                                                        "description": "The requested memories for the container.",
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "namespace": {
+                        "default": "istio-system",
+                        "description": "The namespace in which to install istio",
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "namespaceLimitRange": {
+                        "additionalProperties": false,
+                        "description": "Configuration for the LimitRange set in Istio control plane namespace.",
+                        "properties": {
+                            "defaultLimits": {
+                                "additionalProperties": false,
+                                "description": "Configuration for the default resources limits applied for all Pods (and their containers) that do not set compute resource requests in the namespace.",
+                                "nullable": true,
+                                "properties": {
+                                    "cpu": {
+                                        "default": "",
+                                        "description": "The default CPU limits.",
+                                        "type": "string"
+                                    },
+                                    "memory": {
+                                        "default": "",
+                                        "description": "The default Memory limits.",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "defaultRequests": {
+                                "additionalProperties": false,
+                                "description": "Configuration for the default resources requests applied for all Pods (and their containers) that do not set compute resource requests in the namespace.",
+                                "properties": {
+                                    "cpu": {
+                                        "default": "100m",
+                                        "description": "The default CPU requests.",
+                                        "type": "string"
+                                    },
+                                    "memory": {
+                                        "default": "64Mi",
+                                        "description": "The default Memory requests.",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "pilot": {
+                        "additionalProperties": false,
+                        "description": "Configuration for istiod",
+                        "properties": {
+                            "autoscaling": {
+                                "additionalProperties": false,
+                                "description": "Configuration for istiod autoscaling.",
+                                "properties": {
+                                    "enabled": {
+                                        "default": false,
+                                        "description": "The flag to enable autoscaling on istiod or not. The default value is false.",
+                                        "type": "boolean"
+                                    },
+                                    "maxReplicas": {
+                                        "default": 5,
+                                        "description": "The maximum number of replicas for the istio pilot. The default value is 5.",
+                                        "type": "integer"
+                                    },
+                                    "minReplicas": {
+                                        "default": 2,
+                                        "description": "The minimum number of replicas for istio pilot. The default value is 2.",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "priorityClassName": {
+                                "default": "",
+                                "description": "The priority class assigned to the istiod Pods.",
+                                "type": "string"
+                            },
+                            "replicas": {
+                                "default": 2,
+                                "description": "The replicas set in the istiod Deployment. It takes effect when autoscaling is disabled. The default value is 2.",
+                                "type": "integer"
+                            },
+                            "resources": {
+                                "additionalProperties": false,
+                                "description": "Resources for the containers run in the istiod Pods.",
+                                "properties": {
+                                    "limits": {
+                                        "additionalProperties": false,
+                                        "description": "Resource limits for the container. It is not set by default.",
+                                        "nullable": true,
+                                        "properties": {
+                                            "cpu": {
+                                                "default": "",
+                                                "description": "The limited CPUs for the container.",
+                                                "minLength": 1,
+                                                "type": "string"
+                                            },
+                                            "memory": {
+                                                "default": "",
+                                                "description": "The limited memories for the container.",
+                                                "minLength": 1,
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "requests": {
+                                        "additionalProperties": false,
+                                        "description": "Resource requests for the container.",
+                                        "properties": {
+                                            "cpu": {
+                                                "default": "500m",
+                                                "description": "Requested CPUs for the container.",
+                                                "type": "string"
+                                            },
+                                            "memory": {
+                                                "default": "2048Mi",
+                                                "description": "Requested Memories for the container.",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "support": {
+                        "additionalProperties": false,
+                        "description": "Configuration for istio-support",
+                        "properties": {
+                            "priorityClassName": {
+                                "default": "",
+                                "description": "The priority class assigned to the istio-support Pod.",
+                                "type": "string"
+                            },
+                            "resources": {
+                                "additionalProperties": false,
+                                "description": "Resources for the containers run in the istio-support Pod.",
+                                "properties": {
+                                    "limits": {
+                                        "additionalProperties": false,
+                                        "description": "Resource limits for the container.",
+                                        "nullable": true,
+                                        "properties": {
+                                            "cpu": {
+                                                "default": "250m",
+                                                "description": "The limited CPUs for the container.",
+                                                "type": "string"
+                                            },
+                                            "memory": {
+                                                "default": "256Mi",
+                                                "description": "The limited memories for the container.",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "requests": {
+                                        "additionalProperties": false,
+                                        "description": "Resource requests for the container.",
+                                        "properties": {
+                                            "cpu": {
+                                                "default": "100m",
+                                                "description": "Requested CPUs for the container.",
+                                                "type": "string"
+                                            },
+                                            "memory": {
+                                                "default": "64Mi",
+                                                "description": "Requested Memories for the container.",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "type": "object"
+    }
+}

@@ -1,0 +1,110 @@
+istio:
+  ambientMode:
+      enabled: true
+      ztunnel:
+          resources:
+              requests:
+                  cpu: 200m
+                  memory: 512Mi
+  enableGatewayAPIInference: false
+  enableStrictMTLS: false
+  gateways:
+      egress:
+          autoscaling:
+              enabled: false
+              maxReplicas: 5
+              minReplicas: 1
+          enabled: false
+          namespace: istio-egress
+          namespaceLimitRange:
+              defaultRequests:
+                  cpu: 100m
+                  memory: 128Mi
+          priorityClassName: ""
+          replicas: 1
+          resources:
+              limits:
+                  cpu: 2000m
+                  memory: 1024Mi
+              requests:
+                  cpu: 100m
+                  memory: 128Mi
+      ingress:
+          autoscaling:
+              enabled: false
+              maxReplicas: 5
+              minReplicas: 1
+          enabled: false
+          namespace: istio-ingress
+          namespaceLimitRange:
+              defaultRequests:
+                  cpu: 100m
+                  memory: 128Mi
+          priorityClassName: ""
+          replicas: 1
+          resources:
+              limits:
+                  cpu: 2000m
+                  memory: 1024Mi
+              requests:
+                  cpu: 100m
+                  memory: 128Mi
+  istioCNI:
+      enabled: true
+      resources:
+          requests:
+              cpu: 100m
+              memory: 100Mi
+  meshConfig:
+      accessLogFile: /dev/stdout
+      connectTimeout: 10s
+      enableDNSProxy: false
+      enablePrometheusMerge: true
+      enableTracing: true
+      externalIstiod: false
+      ingressControllerMode: STRICT
+      ingressSelector: ingressgateway
+      meshID: ""
+      meshMTLS:
+          minProtocolVersion: TLSV1_2
+      network: ""
+      proxy:
+          resources:
+              limits:
+                  cpu: 2000m
+                  memory: 1024Mi
+              requests:
+                  cpu: 100m
+                  memory: 128Mi
+      trustDomain: cluster.local
+      trustDomainAliases: []
+      waypoint:
+          resources:
+              limits:
+                  cpu: "3"
+                  memory: 2Gi
+              requests:
+                  cpu: 300m
+                  memory: 512Mi
+  namespace: istio-system
+  namespaceLimitRange:
+      defaultRequests:
+          cpu: 100m
+          memory: 64Mi
+  pilot:
+      autoscaling:
+          enabled: false
+          maxReplicas: 5
+          minReplicas: 2
+      priorityClassName: ""
+      replicas: 2
+      resources:
+          requests:
+              cpu: 500m
+              memory: 2048Mi
+  support:
+      priorityClassName: ""
+      resources:
+          requests:
+              cpu: 100m
+              memory: 64Mi
