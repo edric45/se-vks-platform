@@ -86,6 +86,41 @@ enumerate every legitimate caller, including Prometheus.
 carry a status code. If you see a 403, a waypoint refused it at L7. Useful as a
 first diagnostic: the failure shape tells you which layer denied you.
 
+## A waypoint does not switch L4 enforcement off
+
+Both layers run at once. ztunnel keeps enforcing workload-selector policies at
+the server pod even after a waypoint is in the path — and the connection it sees
+now comes from the **waypoint's** identity, not the original client's.
+
+Measured here with `20-*.yaml` listing only `sa/allowed`, then adding a waypoint:
+
+```
+allowed  GET  -> 503      <-- waypoint admitted it; ztunnel then refused the waypoint
+allowed  POST -> 403
+denied   GET  -> 403
+```
+
+The waypoint's own access log names the cause:
+
+```
+UF,URX upstream_reset_before_response_started{connection_termination}
+"envoy://connect_originate/192.168.146.38:8080"
+```
+
+Add `cluster.local/ns/l4demo/sa/waypoint` to the principals list and it resolves:
+
+```
+allowed  GET  -> 200
+allowed  POST -> 403      <-- waypoint's Envoy, L7
+denied   GET  -> 403      <-- also the waypoint now, not the L4 reset
+```
+
+Two things fall out of that. Any workload-level L4 policy must allow the
+waypoint's service account or you break your own L7 path in a way that looks
+like an application fault. And once a Service routes through a waypoint, the
+client's connection terminates there, so the client-facing denial becomes a 403
+rather than a reset — the reset only appears when there is no waypoint.
+
 ## Relationship to NetworkPolicy
 
 They are complementary and both apply — a connection must pass the CNI's
@@ -94,14 +129,44 @@ reasons and in different places:
 
 | | NetworkPolicy | L4 AuthorizationPolicy |
 |---|---|---|
-| Enforced by | CNI (Antrea/Calico) | ztunnel |
+| Enforced by | CNI (Antrea here) | ztunnel |
 | Matches on | pod selector, namespace, CIDR | SPIFFE identity from the cert |
-| Covers non-mesh traffic | yes | no — only meshed connections |
-| Survives IP reuse / spoofing | no | yes |
+| Covers non-mesh destinations | yes | no |
+| Constrains egress to arbitrary IPs | yes | no (needs an egress waypoint + ServiceEntry) |
+| Survives IP reuse / relabelling | no | yes |
+| Disabled by removing one namespace label | no | yes |
 
-The usual guidance: NetworkPolicy for coarse namespace isolation and for traffic
-that never enters the mesh; AuthorizationPolicy for service-to-service rules,
-because identity is the thing you actually mean.
+### The gap, measured
+
+The `denied` pod is under a strict identity-based ALLOW policy and cannot reach
+`server` in its own namespace. From that same pod:
+
+```
+denied -> 172.17.10.2:6443   (Supervisor API)  : 401   <-- reached
+denied -> 172.30.0.6:10250   (node kubelet)    : 404   <-- reached
+denied -> kubernetes.default:443                : 403   <-- reached
+```
+
+Every one of those is a completed TCP+TLS connection; the status codes are the
+*targets* rejecting the credentials, not the network refusing the connection.
+Istio's L4 authorization constrains nothing here, because none of those
+destinations are meshed workloads — the policy is evaluated at the *destination*
+by that destination's ztunnel, and there isn't one.
+
+So AuthorizationPolicy is not a superset of NetworkPolicy. It is stronger where
+they overlap (identity beats IP) and absent where they do not (egress to
+anything outside the mesh, and traffic to non-meshed pods, nodes and the
+control plane).
+
+Practical split:
+
+- **NetworkPolicy** — a default-deny egress baseline per namespace, CIDR rules,
+  blocking the node/metadata/control-plane endpoints, plus anything involving
+  non-meshed workloads. Also your fallback if someone removes the
+  `istio.io/dataplane-mode` label, which silently voids every Istio policy in
+  the namespace at once.
+- **AuthorizationPolicy** — service-to-service rules inside the mesh, where you
+  actually mean "this identity", not "this IP".
 
 ## With mTLS in PERMISSIVE mode
 

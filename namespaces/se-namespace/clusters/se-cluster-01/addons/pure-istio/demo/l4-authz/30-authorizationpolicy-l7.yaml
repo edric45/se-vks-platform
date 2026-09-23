@@ -10,8 +10,24 @@
 #   kubectl apply -f 30-authorizationpolicy-l7.yaml
 #   kubectl -n l4demo label svc server istio.io/use-waypoint=waypoint
 #
-# Then `allowed` GET -> 200, `allowed` POST -> 403 (an HTTP status, from Envoy),
-# `denied` -> connection reset (still ztunnel, before the waypoint is reached).
+# IMPORTANT -- the L4 policy in 20-*.yaml does NOT stop applying once a waypoint
+# exists. ztunnel still enforces it at the server pod, and the connection now
+# arrives from the WAYPOINT's identity, not the client's. Measured in this lab
+# with only sa/allowed in the principals list:
+#
+#   allowed GET -> 503   (waypoint admitted it, ztunnel then refused the waypoint)
+#
+# with the waypoint's own access log showing
+#   UF,URX upstream_reset_before_response_started{connection_termination}
+#
+# So sa/waypoint must be added to 20-*.yaml's principals. After that:
+#   allowed GET  -> 200
+#   allowed POST -> 403   (HTTP status, from the waypoint's Envoy)
+#   denied  GET  -> 403   (also the waypoint -- the L7 policy rejects it first)
+#
+# Note `denied` now gets 403 rather than the L4 reset: once the Service routes
+# to a waypoint, the client's connection terminates at the waypoint, so that is
+# where the client-facing decision is made.
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
