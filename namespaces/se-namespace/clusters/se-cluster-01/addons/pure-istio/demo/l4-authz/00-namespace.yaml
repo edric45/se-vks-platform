@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: l4demo
+  labels:
+    # Puts every pod in this namespace into the ambient mesh. This one label is
+    # the whole opt-in -- no sidecar injection, no pod annotations, no restart
+    # of anything already running. ztunnel on each node captures the traffic.
+    istio.io/dataplane-mode: ambient
+    # The VKS default is `restricted`, which rejects the waypoint's istio-proxy
+    # container (it does not set seccompProfile). Not needed for the L4 demo
+    # itself, but set here so the L7 contrast in 30-*.yaml can be run without
+    # editing the namespace.
+    pod-security.kubernetes.io/enforce: baseline

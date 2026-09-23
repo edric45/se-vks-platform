@@ -1,0 +1,99 @@
+# Three workloads, two of which are byte-for-byte identical except for the
+# ServiceAccount they run as. That is the entire point of the demo: the policy
+# in 20-*.yaml distinguishes them on cryptographic identity alone.
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: server
+  namespace: l4demo
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: allowed
+  namespace: l4demo
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: denied
+  namespace: l4demo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  namespace: l4demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      serviceAccountName: server
+      containers:
+      - name: nginx
+        # nginx-unprivileged: runs as uid 101 and binds :8080. The stock nginx
+        # image runs as root and binds :80, which PodSecurity rejects.
+        image: nginxinc/nginx-unprivileged:1.27-alpine
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server
+  namespace: l4demo
+spec:
+  selector:
+    app: server
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: allowed
+  namespace: l4demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: allowed
+  template:
+    metadata:
+      labels:
+        app: allowed
+    spec:
+      serviceAccountName: allowed
+      containers:
+      - name: c
+        image: curlimages/curl:8.11.1
+        command: ["sh", "-c", "sleep 3600"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: denied
+  namespace: l4demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: denied
+  template:
+    metadata:
+      labels:
+        app: denied
+    spec:
+      serviceAccountName: denied
+      containers:
+      - name: c
+        image: curlimages/curl:8.11.1
+        command: ["sh", "-c", "sleep 3600"]

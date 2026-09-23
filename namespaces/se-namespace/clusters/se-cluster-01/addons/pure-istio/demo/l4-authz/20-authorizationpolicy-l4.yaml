@@ -1,0 +1,32 @@
+# L4 AuthorizationPolicy -- enforced by ztunnel. No waypoint required.
+#
+# Everything in this policy is answerable from the mTLS handshake and the TCP
+# connection: who is the peer, which namespace, which port. ztunnel terminates
+# the HBONE tunnel and evaluates this before the connection is proxied to the
+# pod.
+#
+# Applying this flips `app: server` to default-deny. Before it existed both
+# clients got HTTP 200; after it, anything not matched by a rule is refused --
+# even though there is no DENY policy anywhere.
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: server-callers
+  namespace: l4demo
+spec:
+  selector:
+    matchLabels:
+      app: server
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        # SPIFFE identity from the peer's certificate. Not an IP, not a pod
+        # label -- the `denied` pod can relabel itself `app: allowed` and is
+        # still refused, because it cannot obtain this certificate.
+        principals: ["cluster.local/ns/l4demo/sa/allowed"]
+    to:
+    - operation:
+        # The POD port, not the Service port. The Service publishes :80 and
+        # targets :8080; ztunnel sees the target.
+        ports: ["8080"]

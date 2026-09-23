@@ -203,6 +203,12 @@ istio-system**. It is explicitly `false` in [`addon.yaml`](addon.yaml) to keep
 the mesh PERMISSIVE. If anyone flips that value, this checklist item breaks
 silently.
 
+When you do start writing namespace-scoped policies, note that the first ALLOW
+policy selecting a workload flips that workload to default-deny — everything
+not matched by a rule is refused, with no DENY policy anywhere. A runnable
+before/after demonstration of this, and of which policy fields ztunnel can
+evaluate without a waypoint, is in [`demo/l4-authz/`](demo/l4-authz/).
+
 ### Do not manage/overwrite the istio.io/dataplane-mode namespace label — **Yes**
 
 Nothing in the add-on or in this configuration sets that label. It is yours.

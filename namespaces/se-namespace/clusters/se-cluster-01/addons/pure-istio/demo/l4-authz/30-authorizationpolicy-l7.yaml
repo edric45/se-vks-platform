@@ -1,0 +1,47 @@
+# The contrast: the same policy shape, but with an L7 condition.
+#
+# Apply this WITHOUT a waypoint and it does not work -- ztunnel cannot parse
+# HTTP, so it cannot evaluate `methods`. Istio's behaviour here is to deny the
+# whole connection at L4 rather than fail open, so the `allowed` caller starts
+# failing too. That failure mode is the clearest demonstration of the boundary.
+#
+# To make it work, deploy the waypoint below and point the Service at it:
+#
+#   kubectl apply -f 30-authorizationpolicy-l7.yaml
+#   kubectl -n l4demo label svc server istio.io/use-waypoint=waypoint
+#
+# Then `allowed` GET -> 200, `allowed` POST -> 403 (an HTTP status, from Envoy),
+# `denied` -> connection reset (still ztunnel, before the waypoint is reached).
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: waypoint
+  namespace: l4demo
+spec:
+  gatewayClassName: istio-waypoint
+  listeners:
+  - name: mesh
+    port: 15008
+    protocol: HBONE
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: server-methods
+  namespace: l4demo
+spec:
+  targetRefs:
+  - kind: Gateway
+    group: gateway.networking.k8s.io
+    name: waypoint
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/l4demo/sa/allowed"]
+    to:
+    - operation:
+        # These three are L7-only. Nothing here is visible to ztunnel.
+        methods: ["GET"]
+        paths: ["/"]
